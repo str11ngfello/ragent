@@ -1,5 +1,5 @@
 use crate::client::{Client, ClientResponse};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::error::Error;
@@ -64,8 +64,8 @@ impl Client for OpenAIClient {
     fn new(api_key: String) -> Self {
         let builder = reqwest::Client::builder();
         let mut header_map = HeaderMap::new();
-        header_map.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        header_map.insert(AUTHORIZATION, HeaderValue::from_str(&format!("Bearer {}", api_key)).expect("unable to build bearer header"));
+        header_map.insert("content-type", HeaderValue::from_static("application/json"));
+        header_map.insert("authorization", HeaderValue::from_str(&format!("Bearer {}", api_key)).expect("unable to build bearer header"));
         let http_client = builder
             .default_headers(header_map)
             .build()
