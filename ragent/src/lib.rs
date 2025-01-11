@@ -3,7 +3,6 @@
 pub mod agent;
 pub mod client;
 pub mod clients;
-pub mod describable;
 pub mod tool;
+pub mod tools;
 pub mod utils;
-pub mod workable;
