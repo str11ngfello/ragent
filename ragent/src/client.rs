@@ -3,10 +3,12 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ClientError {
-    #[error("unknown client error")]
-    UnknownError,
+    #[error("unknown client error: {0}")]
+    UnknownError(String),
     #[error("no response from client")]
     NoResponseError,
+    #[error("client response error ({status}): {message}")]
+    ResponseError { status: u16, message: String },
 }
 
 pub trait CompletionResponse {

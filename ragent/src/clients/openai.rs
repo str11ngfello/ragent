@@ -1,5 +1,5 @@
 use crate::client::{Client, ClientError, CompletionResponse, EmbeddingResponse};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -87,8 +87,9 @@ impl Client for OpenAIClient {
 
         // Check if the response is successful
         if !response.status().is_success() {
+            let status_code = response.status().as_u16();
             let error_text = response.text().await?;
-            return Err(anyhow!("OpenAI API error: {}", error_text));
+            bail!(ClientError::ResponseError { status: status_code, message: error_text });
         }
 
         let response_text = response.text().await?;
