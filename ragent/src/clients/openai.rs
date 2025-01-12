@@ -1,9 +1,8 @@
-use crate::client::{Client, CompletionResponse, EmbeddingResponse};
-use anyhow::Context;
+use crate::client::{Client, ClientError, CompletionResponse, EmbeddingResponse};
+use anyhow::{anyhow, Context, Result};
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response {
@@ -74,7 +73,7 @@ impl Client for OpenAIClient {
         OpenAIClient { http_client }
     }
 
-    async fn completion(&self, message: String) -> Result<Box<dyn CompletionResponse>, Box<dyn Error>> {
+    async fn completion(&self, message: String) -> Result<Box<dyn CompletionResponse>> {
         let response = self
             .http_client
             .post(BASE_URL)
@@ -84,25 +83,30 @@ impl Client for OpenAIClient {
                 "temperature": 0.7
             }))
             .send()
-            .await?
-            .text()
             .await?;
 
-        let final_response: Response = serde_json::from_str(&response).context("failed to parse response in openai client")?;
+        // Check if the response is successful
+        if !response.status().is_success() {
+            let error_text = response.text().await?;
+            return Err(anyhow!("OpenAI API error: {}", error_text));
+        }
+
+        let response_text = response.text().await?;
+        let final_response: Response = serde_json::from_str(&response_text).context("failed to parse response in openai client")?;
         Ok(Box::new(final_response))
     }
 
-    async fn embedding(&self, document: String) -> Result<Box<dyn EmbeddingResponse>, Box<dyn Error>> {
+    async fn embedding(&self, document: String) -> Result<Box<dyn EmbeddingResponse>> {
         todo!()
     }
 }
 
 impl CompletionResponse for Response {
-    fn get_message(&self) -> String {
+    fn get_message(&self) -> Result<String> {
         if let Some(choice) = self.choices.get(0) {
-            choice.message.content.clone()
+            Ok(choice.message.content.clone())
         } else {
-            "asdf".to_string()
+            Err(anyhow!(ClientError::NoResponseError))
         }
     }
 }
