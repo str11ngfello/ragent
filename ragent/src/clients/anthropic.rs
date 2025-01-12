@@ -1,4 +1,4 @@
-use crate::client::{Client, ClientResponse};
+use crate::client::{Client, CompletionResponse, EmbeddingResponse};
 use anyhow::{Context, Result};
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
@@ -52,7 +52,7 @@ impl Client for AnthropicClient {
         AnthropicClient { http_client }
     }
 
-    async fn complete(&self, message: String) -> Result<Box<dyn ClientResponse>, Box<dyn Error>> {
+    async fn completion(&self, message: String) -> Result<Box<dyn CompletionResponse>, Box<dyn Error>> {
         let response = self
             .http_client
             .post(BASE_URL)
@@ -71,9 +71,13 @@ impl Client for AnthropicClient {
         let final_response: Response = serde_json::from_str(&response).context("failed to parse response in anthropic client")?;
         Ok(Box::new(final_response))
     }
+
+    async fn embedding(&self, document: String) -> Result<Box<dyn EmbeddingResponse>, Box<dyn Error>> {
+        todo!()
+    }
 }
 
-impl ClientResponse for Response {
+impl CompletionResponse for Response {
     fn get_message(&self) -> String {
         if let Some(text) = self.content.get(0) {
             text.text.clone()

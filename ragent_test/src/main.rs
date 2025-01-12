@@ -18,17 +18,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(e) => println!("Error: {}", e),
     }
 
-    let client = OpenAIClient::new(env::var("OPENAI_API_KEY")?);
-    let client_reponse = client
-        .complete("What is the capital of Texas?".to_string())
-        .await?;
-    println!("{:#?}", client_reponse.get_message());
-
+    let openai_client = OpenAIClient::new(env::var("OPENAI_API_KEY")?);
     let anthropic_client = AnthropicClient::new(env::var("ANTHROPIC_API_KEY")?);
-    let client_reponse = anthropic_client
-        .complete("What is the capital of Texas?".to_string())
-        .await?;
-    println!("{:#?}", client_reponse.get_message());
+
+    let (openai_response, anthropic_response) = tokio::join!(
+        openai_client.completion("What is the capital of Texas?".to_string()),
+        anthropic_client.completion("What is the capital of Texas?".to_string())
+    );
+
+    match openai_response {
+        Ok(response) => println!("{:#?}", response.get_message()),
+        Err(e) => println!("OpenAI Error: {}", e),
+    }
+
+    match anthropic_response {
+        Ok(response) => println!("{:#?}", response.get_message()),
+        Err(e) => println!("Anthropic Error: {}", e),
+    }
 
     Ok(())
 }
