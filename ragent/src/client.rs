@@ -21,6 +21,6 @@ pub trait EmbeddingResponse {
 
 pub trait Client {
     fn new(api_key: String) -> Self;
-    async fn completion(&self, message: String) -> Result<Box<dyn CompletionResponse>>;
-    async fn embedding(&self, document: String) -> Result<Box<dyn EmbeddingResponse>>;
+    async fn completion(&self, message: &str) -> Result<Box<dyn CompletionResponse>>;
+    async fn embedding(&self, document: &str) -> Result<Box<dyn EmbeddingResponse>>;
 }

@@ -51,7 +51,7 @@ impl Client for AnthropicClient {
         AnthropicClient { http_client }
     }
 
-    async fn completion(&self, message: String) -> Result<Box<dyn CompletionResponse>> {
+    async fn completion(&self, message: &str) -> Result<Box<dyn CompletionResponse>> {
         let response = self
             .http_client
             .post(BASE_URL)
@@ -77,7 +77,7 @@ impl Client for AnthropicClient {
         Ok(Box::new(final_response))
     }
 
-    async fn embedding(&self, document: String) -> Result<Box<dyn EmbeddingResponse>> {
+    async fn embedding(&self, document: &str) -> Result<Box<dyn EmbeddingResponse>> {
         todo!()
     }
 }

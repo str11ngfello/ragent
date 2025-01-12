@@ -22,10 +22,8 @@ async fn main() -> Result<()> {
     let openai_client = OpenAIClient::new(env::var("OPENAI_API_KEY")?);
     let anthropic_client = AnthropicClient::new(env::var("ANTHROPIC_API_KEY")?);
 
-    let (openai_response, anthropic_response) = tokio::join!(
-        openai_client.completion("What is the capital of Texas?".to_string()),
-        anthropic_client.completion("What is the capital of Texas?".to_string())
-    );
+    let (openai_response, anthropic_response) =
+        tokio::join!(openai_client.completion("What is the capital of Texas?"), anthropic_client.completion("What is the capital of Texas?"));
 
     println!("OpenAI: {}", openai_response?.get_message()?);
     println!("Anthropic: {}", anthropic_response?.get_message()?);
