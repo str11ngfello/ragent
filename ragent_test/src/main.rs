@@ -2,6 +2,7 @@
 #![allow(unused_variables)]
 use std::env;
 
+use anyhow::Result;
 use dotenv::dotenv;
 use ragent::client::Client;
 use ragent::clients::anthropic::AnthropicClient;
@@ -11,7 +12,7 @@ use ragent::tools::adder::{Adder, AdderArgs};
 use tokio;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     dotenv().ok();
     match (Adder {}).run(AdderArgs { x: 10.0, y: 2.0 }) {
         Ok(result) => println!("Result: {}", result),
@@ -26,15 +27,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         anthropic_client.completion("What is the capital of Texas?".to_string())
     );
 
-    match openai_response {
-        Ok(response) => println!("{:#?}", response.get_message()),
-        Err(e) => println!("OpenAI Error: {}", e),
-    }
-
-    match anthropic_response {
-        Ok(response) => println!("{:#?}", response.get_message()),
-        Err(e) => println!("Anthropic Error: {}", e),
-    }
+    println!("OpenAI: {}", openai_response?.get_message()?);
+    println!("Anthropic: {}", anthropic_response?.get_message()?);
 
     Ok(())
 }

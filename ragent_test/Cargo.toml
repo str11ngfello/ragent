@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.95"
 dotenv = "0.15.0"
 futures = "0.3.31"
 ragent = { path = "../ragent" }
