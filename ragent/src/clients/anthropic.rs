@@ -87,7 +87,7 @@ impl CompletionResponse for Response {
         if let Some(content) = self.content.get(0) {
             Ok(content.text.clone())
         } else {
-            Err(anyhow!(ClientError::NoResponseError))
+            Err(anyhow!(ClientError::InvalidResponse))
         }
     }
 }

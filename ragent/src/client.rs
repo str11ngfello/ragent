@@ -5,8 +5,8 @@ use thiserror::Error;
 pub enum ClientError {
     #[error("unknown client error: {0}")]
     UnknownError(String),
-    #[error("no response from client")]
-    NoResponseError,
+    #[error("invalid response from client")]
+    InvalidResponse,
     #[error("client response error ({status}): {message}")]
     ResponseError { status: u16, message: String },
 }
@@ -16,7 +16,7 @@ pub trait CompletionResponse {
 }
 
 pub trait EmbeddingResponse {
-    fn get_embedding(&self) -> Result<String>;
+    fn get_embedding(&self) -> Result<Vec<f32>>;
 }
 
 pub trait Client {
